@@ -8,12 +8,14 @@ import re
 import string
 import pickle
 from PIL import Image
+import io
 import pytesseract
+pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
 app = Flask(__name__)
 
 # --- Load Model and Vectorizer ---
-MODEL_PATH = "best_model.keras"
+MODEL_PATH = "../best_model.keras"
 combined_model = load_model(MODEL_PATH)
 
 vocab_size = 100000
@@ -24,7 +26,7 @@ vectorize_layer = TextVectorization(
     output_sequence_length=sequence_length,
     standardize="lower_and_strip_punctuation"
 )
-with open("vectorizer_vocab.pkl", "rb") as f:
+with open("../vectorizer_vocab.pkl", "rb") as f:
     vocab = pickle.load(f)
 vectorize_layer.set_vocabulary(vocab)
 
@@ -36,7 +38,10 @@ def standardize_text(text):
     return text
 
 def preprocess_image(img_file):
-    img = image.load_img(img_file, target_size=(100, 100, 3))
+    img_file.seek(0)
+    img_bytes = img_file.read()
+    img_io = io.BytesIO(img_bytes)
+    img = image.load_img(img_io, target_size=(100, 100, 3))
     img = image.img_to_array(img) / 255.0
     return img
 

@@ -1,151 +1,85 @@
-# Sentimental Notebook
+# Sentiment Analysis App
 
-This project is a multimodal deep learning pipeline for sentiment and emotion analysis on memes, combining image and text features to predict multiple sentiment-related labels.
+This project is a sentiment analysis application that utilizes a Flask backend for processing images and predicting sentiment based on the extracted text. The frontend is built using Streamlit, providing an interactive user interface for users to upload images and view predictions.
 
----
+## Project Structure
 
-## Table of Contents
-
-- [Overview](#overview)
-- [Dataset](#dataset)
-- [Setup](#setup)
-- [Data Preprocessing](#data-preprocessing)
-- [Model Architecture](#model-architecture)
-- [Training](#training)
-- [Evaluation](#evaluation)
-- [Troubleshooting](#troubleshooting)
-- [Acknowledgements](#acknowledgements)
-
----
-
-## Overview
-
-This notebook builds a model that predicts four sentiment-related labels (`humour`, `sarcasm`, `offensive`, `motivational`) from memes using both their images and associated text. The workflow includes data cleaning, image preprocessing, text vectorization, model building (with transfer learning and LSTM), training, and evaluation.
-
----
-
-## Dataset
-
-- **Source:** `memotion_dataset_7k`
-- **Files Used:**
-  - `labels.csv` (contains image names, text, and sentiment labels)
-  - `images/` (folder with meme images)
-
----
-
-## Setup
-
-### Requirements
-
-- Python 3.8+
-- TensorFlow 2.x
-- Keras
-- NumPy
-- Pandas
-- scikit-learn
-- Matplotlib
-- Seaborn
-
-### Installation
-
-```sh
-pip install tensorflow keras numpy pandas scikit-learn matplotlib seaborn
+```
+sentiment-analysis-app
+├── backend
+│   ├── flask_app.py          # Flask application for image processing and sentiment prediction
+│   ├── best_model.keras      # Saved Keras model for sentiment analysis
+│   ├── vectorizer_vocab.pkl  # Vocabulary for text vectorization
+│   └── requirements.txt      # Python dependencies for the backend
+├── frontend
+│   ├── streamlit_app.py      # Streamlit application for user interface
+│   └── requirements.txt      # Python dependencies for the frontend
+└── README.md                 # Project documentation
 ```
 
----
+## Installation
 
-## Data Preprocessing
+To set up the project, follow these steps:
 
-### 1. **Label Encoding**
+1. **Clone the repository:**
+   ```
+   git clone <repository-url>
+   cd sentiment-analysis-app
+   ```
 
-All categorical sentiment labels are mapped to integers:
+2. **Set up the backend:**
+   - Navigate to the `backend` directory:
+     ```
+     cd backend
+     ```
+   - Install the required dependencies:
+     ```
+     pip install -r requirements.txt
+     ```
 
-- `humour`: `not_funny`=0, `funny`=1, `very_funny`=2, `hilarious`=3
-- `sarcasm`: `not_sarcastic`=0, `general`=1, `twisted_meaning`=2, `very_twisted`=3
-- `offensive`: `not_offensive`=0, `slight`/`slightly_offensive`=1, `very_offensive`=2, `hateful_offensive`=3
-- `motivational`: `not_motivational`=0, `motivational`=1
-- `overall_sentiment`: `very_negative`=0, `negative`=1, `neutral`=2, `positive`=3, `very_positive`=4
+3. **Set up the frontend:**
+   - Navigate to the `frontend` directory:
+     ```
+     cd ../frontend
+     ```
+   - Install the required dependencies:
+     ```
+     pip install -r requirements.txt
+     ```
 
-Any stray values like `'slight'` or `'slightly_offensive'` are mapped to `1`.
+## Usage
 
-### 2. **Missing Values**
+### Running the Backend
 
-- All rows with missing values are dropped.
+1. Navigate to the `backend` directory:
+   ```
+   cd backend
+   ```
 
-### 3. **Image Preprocessing**
+2. Start the Flask application:
+   ```
+   python flask_app.py
+   ```
 
-- Images are loaded, resized to 100x100, and normalized to [0, 1].
-- Only images that exist are loaded; the DataFrame is filtered to match successfully loaded images.
+### Running the Frontend
 
-### 4. **Text Preprocessing**
+1. Navigate to the `frontend` directory:
+   ```
+   cd frontend
+   ```
 
-- Text is lowercased, numbers and punctuation are removed, and `.com` substrings are stripped.
-- Text is vectorized using Keras `TextVectorization` with a vocabulary size of 100,000 and sequence length of 50.
+2. Start the Streamlit application:
+   ```
+   streamlit run streamlit_app.py
+   ```
 
-### 5. **Data Splitting**
+## Features
 
-- Data is split into training and test sets (80/20), ensuring alignment between images, text, and labels.
+- Upload images for sentiment analysis.
+- Extract text from images using OCR.
+- Predict sentiment categories: humour, sarcasm, offensive, and motivational.
+- Display extracted text and prediction results in the Streamlit interface.
 
----
+## License
 
-## Model Architecture
-
-### 1. **Image Model**
-
-- Uses transfer learning with ResNet50 and VGG16 (pretrained on ImageNet, frozen).
-- Outputs are concatenated and passed through additional layers.
-
-### 2. **Text Model**
-
-- Embedding layer followed by two Bidirectional LSTM layers and dense layers.
-
-### 3. **Combined Model**
-
-- Image and text features are concatenated.
-- Dense layers and dropout for regularization.
-- Final output: 4 regression heads (for each sentiment label).
-
----
-
-## Training
-
-- Loss: Mean Squared Error (MSE)
-- Metric: Mean Absolute Error (MAE)
-- Callbacks: ReduceLROnPlateau, EarlyStopping, ModelCheckpoint
-- Data augmentation is applied to images (random flip and rotation).
-
----
-
-## Evaluation
-
-- Plots for training/validation loss and MAE.
-- MAE is reported for each label.
-- Classification reports and confusion matrices are generated for each label.
-
----
-
-## Troubleshooting
-
-- **Label dtype errors:**  
-  Ensure all label columns are numeric. Any stray string values (like `'slight'`) are mapped to integers before conversion.
-- **Image/text alignment:**  
-  Only rows with successfully loaded images are used for training/testing.
-- **Git LFS:**  
-  If using Git LFS for images, ensure all images are tracked after running `git lfs track "*.jpg"` and re-add any untracked files.
-
----
-
-## Acknowledgements
-
-- [Memotion Dataset](https://www.kaggle.com/datasets/abhinavwalia95/memotion-dataset-7k)
-- TensorFlow and Keras documentation
-
----
-
-## Example Usage
-
-```python
-# To run the notebook, open sentimental_notebook.ipynb in VS Code or Jupyter and execute cells sequentially.
-```
-
----
+This project is licensed under the MIT License. See the LICENSE file for more details.
